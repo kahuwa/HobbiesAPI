@@ -1,3 +1,10 @@
+using HobbiesAPI.Data;
+using Microsoft.EntityFrameworkCore;
+using HobbiesAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using HobbiesAPI.Repositories;
+using HobbiesAPI.Entity;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,9 +14,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddScoped<IHobbiesService, HobbiesService>();
+builder.Services.AddScoped<IHobbiesRepository, HobbiesAPI.Repositories.HobbiesRepository>();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+    
+    
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -23,3 +37,17 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public class HobbiesController : ControllerBase
+
+{
+    private readonly IHobbiesService _hobbiesService;
+
+    public HobbiesController(IHobbiesService hobbiesService)
+    {
+        _hobbiesService = hobbiesService;
+    }
+
+   
+}
+
